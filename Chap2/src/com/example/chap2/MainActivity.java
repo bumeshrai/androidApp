@@ -6,7 +6,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -25,7 +24,7 @@ public class MainActivity extends Activity {
         final TextView answerfield = (TextView) findViewById(R.id.answer);
 
         final Button button = (Button) findViewById(R.id.calculate);
-        button.setOnClickListener(new OnClickListener() {
+        button.setOnClickListener(new Button.OnClickListener() {
 
             public void onClick(View v) {
                 try {
