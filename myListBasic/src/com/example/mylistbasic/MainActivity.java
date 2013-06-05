@@ -17,15 +17,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 public class MainActivity extends Activity {
 	
-	//private ListView lv;
-
+	private ListView lv;
+	private ArrayAdapter adapter;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
 		showFiles();
-	     
 	}
 
 	
@@ -57,8 +57,8 @@ public class MainActivity extends Activity {
 	    }
 	    //rootStr = item.toString();
 
-	    ListView lv = (ListView) findViewById(R.id.listView);
-	    ArrayAdapter adapter = new ArrayAdapter<String>(this, 
+	    lv = (ListView) findViewById(R.id.listView);
+	    adapter = new ArrayAdapter<String>(this, 
 	            android.R.layout.simple_list_item_1, item);
 	    lv.setAdapter(adapter);
 
