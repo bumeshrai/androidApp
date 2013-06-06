@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.graphics.Path;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -45,7 +46,7 @@ public class MainActivity extends Activity {
 	    filePath.add("Present Location is: "+rootStr);
 
 	    if(isRoot(rootStr)){
-	    	//path.add(file.getParent());
+	    	filePath.add("Go to Parent Folder (../)");
 	    }
 	    
 	    for(int i = 0; i < files.length; i++) {
@@ -66,16 +67,40 @@ public class MainActivity extends Activity {
 		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 		     public void onItemClick(AdapterView<?> parentAdapter, View view, int position,
 		                             long id) {
-		         
-		    	 //Position starts from 1
-		         if(files[position-1].isDirectory()){
-		        	 rootStr += "/"+files[position-1].getName();
-		        	 showFiles();
-		        	 Toast.makeText(MainActivity.this, "Item with id ["+id+"] - Position ["+position+"] -  ["+rootStr+"]", Toast.LENGTH_SHORT).show();
-		         } else {
-		        	 Toast.makeText(MainActivity.this, "["+files[position-1].getName()+"]", Toast.LENGTH_SHORT).show();
-		         }
+		         if(position > 0) { //do nothing
+		        	 if(position == 1) { // go to parent folder
+		        		 navigateRev();
+		        	 } else { // two extra entry at top, so roll back.
+		        		 if(files[position-2].isDirectory()){ //check if directory
+			        	 navigateDir(position);
+		        		 } else {
+			        	 showFilename(position);
+		        		 }
+		        	 }
+		        }
 		     }
+
+			private void showFilename(int position) {
+				// TODO Auto-generated method stub
+	        	 Toast.makeText(MainActivity.this, "Position ["+position+"] -  ["+"File: "+files[position-2].getName()+"]", Toast.LENGTH_SHORT).show();
+
+			}
+
+			private void navigateDir(int position) {
+				// TODO Auto-generated method stub
+	        	 rootStr += "/"+files[position-2].getName();
+	        	 showFiles();
+	        	 Toast.makeText(MainActivity.this, "Position ["+position+"] -  ["+"Opening folder: "+rootStr+"]", Toast.LENGTH_SHORT).show();
+				
+			}
+
+			private void navigateRev() {
+				// TODO Auto-generated method stub
+	        	//Path p1 = Paths.get("/tmp/foo");
+	        	rootStr = file.getParentFile().getParentFile().getPath();
+				showFiles();
+	        	Toast.makeText(MainActivity.this, "["+rootStr+"]", Toast.LENGTH_SHORT).show();
+			}
 		});
 
 	}
