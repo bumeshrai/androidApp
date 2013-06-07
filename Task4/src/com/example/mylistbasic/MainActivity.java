@@ -2,31 +2,26 @@ package com.example.mylistbasic;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Date;
 
 import android.os.Bundle;
 import android.os.Environment;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.graphics.Path;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.GridView;
 import android.widget.Toast;
 
 
 public class MainActivity extends Activity {
 	
-	private ListView lv;
-	private ArrayAdapter adapter;
+	private GridView gv;
     private ArrayList<String> filePath;
     private String rootStr;
     private File file;
     private File[] files;
+    private boolean goDown;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -40,56 +35,76 @@ public class MainActivity extends Activity {
 	
 	private void showFiles() {
 		
+		goDown = true;
+		
 	    file = new File(rootStr);
 	    files = file.listFiles();
 	        
 	    filePath = new ArrayList<String>();
 	    
-	    filePath.add("Present Location is: "+rootStr);
-
+	    filePath.add("Loc: "+rootStr);
+	    add2Space();
+	    
 	    if(isRoot(rootStr)){
-	    	filePath.add("Go to Parent Folder (../)");
+	    	filePath.add("(../)");
+	    	add2Space();
+	    } else {
+	    	filePath.add("You are at root");
+	    	add2Space();
+	    	goDown = false;
 	    }
 	    
 	    for(int i = 0; i < files.length; i++) {
 	    	file = files[i];
 	    	if(file.isDirectory()) {
 	    		filePath.add("/"+file.getName());
-	    	} else {
-	    		String fName = getFileName(file.getName());
-	    		String fExt = getFileExt(file.getName());
-	    		String fSize = getFileSize(file);
-	    		filePath.add(fName+"   "+fExt+"   "+fSize);
-	    		//filePath.add(file.getName());
+	    		add2Space();
+	    		} else {
+	    		filePath.add(getFileName(file.getName()));
+	    		filePath.add(getFileExt(file.getName()));
+	    		filePath.add(getFileSize(file));
 	    	}
 	    }
-	    //rootStr = item.toString();
 
-	    lv = (ListView) findViewById(R.id.listView);
-	    adapter = new ArrayAdapter<String>(this, 
+	    gv = (GridView) findViewById(R.id.gridview);
+	    ArrayAdapter adapter = new ArrayAdapter<String>(this, 
 	            android.R.layout.simple_list_item_1, filePath);
-	    lv.setAdapter(adapter);
+	    gv.setAdapter(adapter);
 
-		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-		     public void onItemClick(AdapterView<?> parentAdapter, View view, int position,
-		                             long id) {
-		         if(position > 0) { //do nothing
-		        	 if(position == 1) { // go to parent folder
-		        		 navigateRev();
-		        	 } else { // two extra entry at top, so roll back.
-		        		 if(files[position-2].isDirectory()){ //check if directory
-			        	 navigateDir(position);
+		gv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+		     public void onItemClick(AdapterView<?> parentAdapter, 
+		    		 View view, int position, long id) {
+		    	 switch(position/3) {
+		            case 1:
+		              //Go back to parent
+		            	navigateRev();
+		              break;
+		            case 0:
+		              //do nothing
+		              break;
+		            default:
+		            	//open if directory 
+		        		 if(files[position/3-2].isDirectory()){ //check if directory
+			        	 navigateDir(position/3);
 		        		 } else {
-			        	 showFilename(position);
+			        	 showFilename(position/3);
 		        		 }
-		        	 }
-		        }
+		        		 break;
+		          }
+		    	 
 		     }
 
 		});
 
 	}
 		
+	private void add2Space() {
+		// TODO Auto-generated method stub
+		filePath.add(" ");
+		filePath.add(" ");
+	}
+
+
 	private String getFileSize(File name) {
 		// TODO Auto-generated method stub
 		return(file.length()/1024+"kb");
@@ -126,7 +141,10 @@ public class MainActivity extends Activity {
 		
 	private void showFilename(int position) {
 		// TODO Auto-generated method stub
-    	 Toast.makeText(MainActivity.this, "Position ["+position+"] -  ["+"File: "+files[position-2].getName()+"]", Toast.LENGTH_SHORT).show();
+    	 Toast.makeText(MainActivity.this, "["+"File: "+files[position-2].getName()+
+    			 	"; Size: "+files[position-2].length()+
+    			 	"; modified on: "+ new Date(files[position-2].lastModified()) +
+    			 	"]", Toast.LENGTH_LONG).show();
 
 	}
 
@@ -134,7 +152,7 @@ public class MainActivity extends Activity {
 		// TODO Auto-generated method stub
     	 rootStr += "/"+files[position-2].getName();
     	 showFiles();
-    	 Toast.makeText(MainActivity.this, "Position ["+position+"] -  ["+"Opening folder: "+rootStr+"]", Toast.LENGTH_SHORT).show();
+    	 Toast.makeText(MainActivity.this, "["+"Opening folder: "+rootStr+"]", Toast.LENGTH_LONG).show();
 		
 	}
 
@@ -144,5 +162,5 @@ public class MainActivity extends Activity {
 		showFiles();
     	Toast.makeText(MainActivity.this, "["+rootStr+"]", Toast.LENGTH_SHORT).show();
 	}
-	
+
 }
