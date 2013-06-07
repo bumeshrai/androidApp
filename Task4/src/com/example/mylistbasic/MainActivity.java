@@ -2,7 +2,6 @@ package com.example.mylistbasic;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,14 +13,14 @@ import android.graphics.Path;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
 public class MainActivity extends Activity {
 	
-	private ListView lv;
+	private GridView gv;
 	private ArrayAdapter adapter;
     private ArrayList<String> filePath;
     private String rootStr;
@@ -45,42 +44,45 @@ public class MainActivity extends Activity {
 	        
 	    filePath = new ArrayList<String>();
 	    
-	    filePath.add("Present Location is: "+rootStr);
-
+	    filePath.add("Loc: "+rootStr);
+	    filePath.add(" ");
+	    filePath.add(" ");
+	    
 	    if(isRoot(rootStr)){
-	    	filePath.add("Go to Parent Folder (../)");
+	    	filePath.add("(../)");
+	    	filePath.add(" ");
+	    	filePath.add(" ");
 	    }
 	    
 	    for(int i = 0; i < files.length; i++) {
 	    	file = files[i];
 	    	if(file.isDirectory()) {
 	    		filePath.add("/"+file.getName());
+	    		for (int j = 0; j < 2; j++)
+	    			filePath.add(" ");
 	    	} else {
-	    		String fName = getFileName(file.getName());
-	    		String fExt = getFileExt(file.getName());
-	    		String fSize = getFileSize(file);
-	    		filePath.add(fName+"   "+fExt+"   "+fSize);
-	    		//filePath.add(file.getName());
+	    		filePath.add(getFileName(file.getName()));
+	    		filePath.add(getFileExt(file.getName()));
+	    		filePath.add(getFileSize(file));
 	    	}
 	    }
-	    //rootStr = item.toString();
 
-	    lv = (ListView) findViewById(R.id.listView);
+	    gv = (GridView) findViewById(R.id.gridview);
 	    adapter = new ArrayAdapter<String>(this, 
 	            android.R.layout.simple_list_item_1, filePath);
-	    lv.setAdapter(adapter);
+	    gv.setAdapter(adapter);
 
-		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-		     public void onItemClick(AdapterView<?> parentAdapter, View view, int position,
-		                             long id) {
-		         if(position > 0) { //do nothing
-		        	 if(position == 1) { // go to parent folder
+		gv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+		     public void onItemClick(AdapterView<?> parentAdapter, 
+		    		 View view, int position, long id) {
+		         if(position > 0) { //do something
+		        	 if(position/3 == 1) { // go to parent folder
 		        		 navigateRev();
 		        	 } else { // two extra entry at top, so roll back.
-		        		 if(files[position-2].isDirectory()){ //check if directory
-			        	 navigateDir(position);
+		        		 if(files[position/3-2].isDirectory()){ //check if directory
+			        	 navigateDir(position/3);
 		        		 } else {
-			        	 showFilename(position);
+			        	 showFilename(position/3);
 		        		 }
 		        	 }
 		        }
@@ -144,5 +146,5 @@ public class MainActivity extends Activity {
 		showFiles();
     	Toast.makeText(MainActivity.this, "["+rootStr+"]", Toast.LENGTH_SHORT).show();
 	}
-	
+
 }
