@@ -54,7 +54,11 @@ public class MainActivity extends Activity {
 	    	if(file.isDirectory()) {
 	    		filePath.add("/"+file.getName());
 	    	} else {
-	    		filePath.add(file.getName());
+	    		String fName = getFileName(file.getName());
+	    		String fExt = getFileExt(file.getName());
+	    		String fSize = getFileSize(file);
+	    		filePath.add(fName+"   "+fExt+"   "+fSize);
+	    		//filePath.add(file.getName());
 	    	}
 	    }
 	    //rootStr = item.toString();
@@ -80,31 +84,37 @@ public class MainActivity extends Activity {
 		        }
 		     }
 
-			private void showFilename(int position) {
-				// TODO Auto-generated method stub
-	        	 Toast.makeText(MainActivity.this, "Position ["+position+"] -  ["+"File: "+files[position-2].getName()+"]", Toast.LENGTH_SHORT).show();
-
-			}
-
-			private void navigateDir(int position) {
-				// TODO Auto-generated method stub
-	        	 rootStr += "/"+files[position-2].getName();
-	        	 showFiles();
-	        	 Toast.makeText(MainActivity.this, "Position ["+position+"] -  ["+"Opening folder: "+rootStr+"]", Toast.LENGTH_SHORT).show();
-				
-			}
-
-			private void navigateRev() {
-				// TODO Auto-generated method stub
-	        	//Path p1 = Paths.get("/tmp/foo");
-	        	rootStr = file.getParentFile().getParentFile().getPath();
-				showFiles();
-	        	Toast.makeText(MainActivity.this, "["+rootStr+"]", Toast.LENGTH_SHORT).show();
-			}
 		});
 
 	}
 		
+	private String getFileSize(File name) {
+		// TODO Auto-generated method stub
+		return(file.length()/1024+"kb");
+	}
+
+
+	private String getFileExt(String name) {
+		// TODO Auto-generated method stub
+		int mid= name.lastIndexOf(".");
+		if(mid != -1)
+			return(name.substring(mid+1,name.length()));
+		else
+			return("" );
+
+	}
+
+
+	private String getFileName(String name) {
+		// TODO Auto-generated method stub
+		int mid= name.lastIndexOf(".");
+		if(mid != -1)
+			return(name.substring(0,mid));
+		else
+			return(name);
+	}
+
+
 	public boolean isRoot(String root) {
 		if(root.equals("/"))
 			return false;
@@ -112,5 +122,26 @@ public class MainActivity extends Activity {
 			return true;
 	}
 		
+	private void showFilename(int position) {
+		// TODO Auto-generated method stub
+    	 Toast.makeText(MainActivity.this, "Position ["+position+"] -  ["+"File: "+files[position-2].getName()+"]", Toast.LENGTH_SHORT).show();
+
+	}
+
+	private void navigateDir(int position) {
+		// TODO Auto-generated method stub
+    	 rootStr += "/"+files[position-2].getName();
+    	 showFiles();
+    	 Toast.makeText(MainActivity.this, "Position ["+position+"] -  ["+"Opening folder: "+rootStr+"]", Toast.LENGTH_SHORT).show();
+		
+	}
+
+	private void navigateRev() {
+		// TODO Auto-generated method stub
+    	//Path p1 = Paths.get("/tmp/foo");
+    	rootStr = file.getParentFile().getParent();
+		showFiles();
+    	Toast.makeText(MainActivity.this, "["+rootStr+"]", Toast.LENGTH_SHORT).show();
+	}
 	
 }
