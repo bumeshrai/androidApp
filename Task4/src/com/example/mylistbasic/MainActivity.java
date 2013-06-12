@@ -2,30 +2,26 @@ package com.example.mylistbasic;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.Date;
 
 import android.os.Bundle;
 import android.os.Environment;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.graphics.Path;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 
 public class MainActivity extends Activity {
 	
 	private GridView gv;
-	private ArrayAdapter adapter;
     private ArrayList<String> filePath;
     private String rootStr;
     private File file;
     private File[] files;
+    private boolean goDown;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -39,28 +35,31 @@ public class MainActivity extends Activity {
 	
 	private void showFiles() {
 		
+		goDown = true;
+		
 	    file = new File(rootStr);
 	    files = file.listFiles();
 	        
 	    filePath = new ArrayList<String>();
 	    
 	    filePath.add("Loc: "+rootStr);
-	    filePath.add(" ");
-	    filePath.add(" ");
+	    add2Space();
 	    
 	    if(isRoot(rootStr)){
 	    	filePath.add("(../)");
-	    	filePath.add(" ");
-	    	filePath.add(" ");
+	    	add2Space();
+	    } else {
+	    	filePath.add("You are at root");
+	    	add2Space();
+	    	goDown = false;
 	    }
 	    
 	    for(int i = 0; i < files.length; i++) {
 	    	file = files[i];
 	    	if(file.isDirectory()) {
 	    		filePath.add("/"+file.getName());
-	    		for (int j = 0; j < 2; j++)
-	    			filePath.add(" ");
-	    	} else {
+	    		add2Space();
+	    		} else {
 	    		filePath.add(getFileName(file.getName()));
 	    		filePath.add(getFileExt(file.getName()));
 	    		filePath.add(getFileSize(file));
@@ -68,30 +67,44 @@ public class MainActivity extends Activity {
 	    }
 
 	    gv = (GridView) findViewById(R.id.gridview);
-	    adapter = new ArrayAdapter<String>(this, 
+	    ArrayAdapter adapter = new ArrayAdapter<String>(this, 
 	            android.R.layout.simple_list_item_1, filePath);
 	    gv.setAdapter(adapter);
 
 		gv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 		     public void onItemClick(AdapterView<?> parentAdapter, 
 		    		 View view, int position, long id) {
-		         if(position > 0) { //do something
-		        	 if(position/3 == 1) { // go to parent folder
-		        		 navigateRev();
-		        	 } else { // two extra entry at top, so roll back.
+		    	 switch(position/3) {
+		            case 1:
+		              //Go back to parent
+		            	navigateRev();
+		              break;
+		            case 0:
+		              //do nothing
+		              break;
+		            default:
+		            	//open if directory 
 		        		 if(files[position/3-2].isDirectory()){ //check if directory
 			        	 navigateDir(position/3);
 		        		 } else {
 			        	 showFilename(position/3);
 		        		 }
-		        	 }
-		        }
+		        		 break;
+		          }
+		    	 
 		     }
 
 		});
 
 	}
 		
+	private void add2Space() {
+		// TODO Auto-generated method stub
+		filePath.add(" ");
+		filePath.add(" ");
+	}
+
+
 	private String getFileSize(File name) {
 		// TODO Auto-generated method stub
 		return(file.length()/1024+"kb");
@@ -128,7 +141,10 @@ public class MainActivity extends Activity {
 		
 	private void showFilename(int position) {
 		// TODO Auto-generated method stub
-    	 Toast.makeText(MainActivity.this, "Position ["+position+"] -  ["+"File: "+files[position-2].getName()+"]", Toast.LENGTH_SHORT).show();
+    	 Toast.makeText(MainActivity.this, "["+"File: "+files[position-2].getName()+
+    			 	"; Size: "+files[position-2].length()+
+    			 	"; modified on: "+ new Date(files[position-2].lastModified()) +
+    			 	"]", Toast.LENGTH_LONG).show();
 
 	}
 
@@ -136,7 +152,7 @@ public class MainActivity extends Activity {
 		// TODO Auto-generated method stub
     	 rootStr += "/"+files[position-2].getName();
     	 showFiles();
-    	 Toast.makeText(MainActivity.this, "Position ["+position+"] -  ["+"Opening folder: "+rootStr+"]", Toast.LENGTH_SHORT).show();
+    	 Toast.makeText(MainActivity.this, "["+"Opening folder: "+rootStr+"]", Toast.LENGTH_LONG).show();
 		
 	}
 
